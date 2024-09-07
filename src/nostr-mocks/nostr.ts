@@ -14,14 +14,21 @@ export default class Nostr {
     return this.#publicKey
   }
 
-  static #relays: RelayRecord | undefined
+  static #defaultRelays: RelayRecord = {
+    'wss://relay.damus.io': { read: true, write: true },
+    'wss://yabu.me': { read: true, write: true }
+  }
+  static additionalRelays: RelayRecord | undefined
   static async relays() {
-    if (this.#relays === undefined) {
+    if (this.additionalRelays === undefined) {
       const newRelays = await window.nostr?.getRelays()
       if (newRelays === undefined) throw 'undefined relays'
-      this.#relays = newRelays
+      this.additionalRelays = newRelays
     }
-    return this.#relays
+    return {
+      ...this.#defaultRelays,
+      ...this.additionalRelays
+    }
   }
 }
 
